@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaloneBlood - Open-Source Blood Registry Network</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary:   #0D1117;
+            --bg-surface:   #161B22;
+            --bg-card:      #1C2230;
+            --red:          #D90429;
+            --red-light:    #EF233C;
+            --red-glow:     rgba(217, 4, 41, 0.14);
+            --green:        #1E8A44;
+            --text-primary: #F0F2F5;
+            --text-secondary:#8D99AE;
+            --text-muted:   #4A5568;
+            --border:       rgba(255,255,255,0.08);
+            --border-red:   rgba(217, 4, 41, 0.3);
+            --font-display: 'Barlow Condensed', sans-serif;
+            --font-body:    'Nunito Sans', sans-serif;
+            --nav-h:        68px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: sticky; top: 0; z-index: 100;
+            height: var(--nav-h);
+            background: rgba(13,17,23,0.92);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center;
+            padding: 0 clamp(1rem, 5vw, 3rem);
+            gap: 2rem;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.6rem; font-weight: 800; letter-spacing: 0.02em;
+            color: var(--text-primary); text-decoration: none;
+            display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;
+        }
+        .logo-drop {
+            width: 26px; height: 26px;
+            background: var(--red);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg); flex-shrink: 0;
+        }
+        .logo span { color: var(--red); }
+
+        nav { display: flex; align-items: center; gap: 0.25rem; flex: 1; }
+        nav a {
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 0.875rem; font-weight: 600;
+            padding: 0.5rem 0.75rem; border-radius: 6px;
+            transition: color 0.2s, background 0.2s; white-space: nowrap;
+        }
+        nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.06); }
+
+        .cta-urgent {
+            font-family: var(--font-display);
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em;
+            color: #fff; background: var(--red); border: none;
+            padding: 0.55rem 1.25rem; border-radius: 6px;
+            cursor: pointer; transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0; white-space: nowrap;
+        }
+        .cta-urgent:hover { background: var(--red-light); }
+        .cta-urgent:active { transform: scale(0.97); }
+
+        .hamburger {
+            display: none; background: none; border: none;
+            color: var(--text-primary); cursor: pointer;
+            padding: 0.5rem; font-size: 1.4rem; margin-left: auto;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: calc(100vh - var(--nav-h));
+            display: flex; align-items: center;
+            padding: clamp(3rem,8vw,6rem) clamp(1rem,5vw,3rem);
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 65% 55% at 72% 50%, rgba(217,4,41,0.09) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-content { max-width: 680px; position: relative; z-index: 1; }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--red-light);
+            background: var(--red-glow); border: 1px solid var(--border-red);
+            padding: 0.35rem 0.85rem; border-radius: 100px; margin-bottom: 1.5rem;
+        }
+        .pulse-dot {
+            width: 7px; height: 7px; background: var(--red);
+            border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; transform:scale(1); }
+            50%      { opacity:0.4; transform:scale(0.65); }
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            font-weight: 800; line-height: 1.05; letter-spacing: -0.01em;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 em { font-style: normal; color: var(--red); }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            color: var(--text-secondary);
+            max-width: 520px; margin-bottom: 2.5rem; line-height: 1.7;
+        }
+
+        .hero-buttons { display: flex; flex-wrap: wrap; gap: 1rem; }
+
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+            letter-spacing: 0.04em; color: #fff; background: var(--red);
+            text-decoration: none; padding: 0.9rem 2rem; border-radius: 8px;
+            border: none; cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-primary:hover { background: var(--red-light); transform: translateY(-2px); }
+        .btn-primary:active { transform: scale(0.97); }
+
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+            letter-spacing: 0.04em; color: var(--text-primary); background: transparent;
+            text-decoration: none; padding: 0.9rem 2rem; border-radius: 8px;
+            border: 1.5px solid rgba(255,255,255,0.18);
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+        }
+        .btn-secondary:hover {
+            border-color: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-2px);
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem clamp(1rem,5vw,3rem);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+            gap: 1.5rem; max-width: 900px; margin: 0 auto; text-align: center;
+        }
+        .stat-item strong {
+            display: block; font-family: var(--font-display);
+            font-size: 2.2rem; font-weight: 800; color: var(--red); line-height: 1;
+        }
+        .stat-item span {
+            font-size: 0.75rem; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+        }
+
+        /* ── SECTIONS ── */
+        section { padding: clamp(3rem,6vw,5rem) clamp(1rem,5vw,3rem); }
+
+        .section-label {
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--red); margin-bottom: 0.6rem;
+        }
+        .section-header { margin-bottom: 2.5rem; }
+        .section-header h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem,4vw,2.8rem); font-weight: 800;
+            line-height: 1.1; margin-bottom: 0.6rem;
+        }
+        .section-header p { color: var(--text-secondary); font-size: 1rem; max-width: 560px; }
+
+        /* ── SHORTAGES ── */
+        .shortages-section { background: var(--bg-surface); }
+
+        .filter-bar {
+            display: flex; align-items: center;
+            gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+        }
+        .filter-label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+
+        .district-select {
+            font-family: var(--font-body); font-size: 0.875rem; font-weight: 600;
+            color: var(--text-primary); background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.55rem 2.2rem 0.55rem 0.85rem;
+            border-radius: 8px; cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238D99AE' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 0.75rem center;
+            transition: border-color 0.2s;
+        }
+        .district-select:focus { outline: none; border-color: var(--red); }
+
+        .shortages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px,1fr));
+            gap: 1rem;
+        }
+
+        .shortage-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.25rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .shortage-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.14); }
+        .shortage-card.urgent  { border-left: 3px solid var(--red); }
+        .shortage-card.stable  { border-left: 3px solid var(--green); }
+
+        .card-header-row {
+            display: flex; align-items: flex-start;
+            justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem;
+        }
+        .hospital-name { font-size: 0.9rem; font-weight: 700; line-height: 1.3; }
+        .hospital-name small { color: var(--text-secondary); font-weight: 400; font-size: 0.8rem; }
+
+        .status-badge {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; padding: 0.25rem 0.6rem;
+            border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+        }
+        .status-badge.urgent { background: rgba(217,4,41,0.2); color: #FF6B7A; }
+        .status-badge.stable { background: rgba(30,138,68,0.2);  color: #5CDB95; }
+
+        .blood-type-display {
+            font-family: var(--font-display); font-size: 2.6rem;
+            font-weight: 800; color: var(--red); line-height: 1; margin-bottom: 0.4rem;
+        }
+        .shortage-card.stable .blood-type-display { color: #5CDB95; }
+
+        .shortage-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; }
+
+        .urgency-bar {
+            height: 4px; background: rgba(255,255,255,0.07);
+            border-radius: 2px; overflow: hidden;
+        }
+        .urgency-fill { height: 100%; border-radius: 2px; background: var(--red); }
+        .shortage-card.stable .urgency-fill { background: var(--green); }
+
+        /* ── HOW IT WORKS ── */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+            gap: 2.5rem;
+        }
+        .step-number {
+            font-family: var(--font-display); font-size: 4rem; font-weight: 800;
+            color: rgba(217,4,41,0.14); line-height: 1; margin-bottom: 0.4rem;
+        }
+        .step-icon-wrap {
+            width: 48px; height: 48px;
+            background: var(--red-glow); border: 1px solid var(--border-red);
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; margin-bottom: 1rem; font-size: 1.3rem;
+        }
+        .step-card h3 {
+            font-family: var(--font-display); font-size: 1.35rem; font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .step-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
+
+        /* ── REGISTER CTA ── */
+        .register-section {
+            border-top: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(217,4,41,0.1) 0%, transparent 60%);
+        }
+        .register-inner { max-width: 700px; }
+
+        .register-form { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+
+        .form-input {
+            font-family: var(--font-body); font-size: 0.9rem;
+            color: var(--text-primary); background: var(--bg-card);
+            border: 1px solid var(--border); padding: 0.72rem 1rem;
+            border-radius: 8px; flex: 1; min-width: 150px;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { outline: none; border-color: var(--red); }
+        .form-input::placeholder { color: var(--text-muted); }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            padding: 2rem clamp(1rem,5vw,3rem);
+        }
+        .footer-inner {
+            display: flex; flex-wrap: wrap;
+            align-items: center; justify-content: space-between; gap: 1rem;
+        }
+        .footer-text { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8; }
+        .footer-sdg { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .sdg-badge {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+            padding: 0.3rem 0.75rem; border-radius: 100px;
+            border: 1px solid var(--border); color: var(--text-secondary);
+        }
+
+        /* ── RESPONSIVE: TABLET ── */
+        @media (max-width: 768px) {
+            nav { display: none; }
+            nav.open {
+                display: flex; flex-direction: column;
+                position: fixed; top: var(--nav-h); left: 0; right: 0;
+                background: var(--bg-surface); padding: 1rem;
+                border-bottom: 1px solid var(--border); z-index: 99;
+            }
+            .hamburger { display: block; }
+            .cta-urgent { display: none; }
+            .stats-grid { grid-template-columns: repeat(2,1fr); }
+            .steps-grid { grid-template-columns: repeat(2,1fr); }
+        }
+
+        /* ── RESPONSIVE: MOBILE ── */
+        @media (max-width: 480px) {
+            .hero-buttons { flex-direction: column; }
+            .btn-primary, .btn-secondary { justify-content: center; text-align: center; }
+            .shortages-grid { grid-template-columns: 1fr; }
+            .steps-grid  { grid-template-columns: 1fr; }
+            .register-form { flex-direction: column; }
+            .stats-grid { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+    <a href="#" class="logo">
+        <div class="logo-drop"></div>
+        Salone<span>Blood</span>
+    </a>
+    <nav id="main-nav">
+        <a href="#about">How It Works</a>
+        <a href="#shortages">Urgent Shortages</a>
+        <a href="#register">Register as Donor</a>
+    </nav>
+    <button class="cta-urgent" onclick="window.location.href='#request'">⚡ EMERGENCY REQUEST</button>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">&#9776;</button>
+</header>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <div class="pulse-dot"></div>
+            Live System &middot; Sierra Leone
+        </div>
+        <h1>Save a Life in<br><em>Sierra Leone.</em><br>Donate Blood Today.</h1>
+        <p>Connecting patients in need with voluntary, local blood donors instantly across every district — no connections needed, no frantic WhatsApp posts. Just one click.</p>
+        <div class="hero-buttons">
+            <a href="#request" class="btn-primary">🩸 I Need Blood</a>
+            <a href="#register" class="btn-secondary">💉 I Want to Donate</a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ STATS BAR ═══════════ -->
+<div class="stats-bar">
+    <div class="stats-grid">
+        <div class="stat-item">
+            <strong>347</strong>
+            <span>Donors Registered</span>
+        </div>
+        <div class="stat-item">
+            <strong>12</strong>
+            <span>Active Requests</span>
+        </div>
+        <div class="stat-item">
+            <strong>8</strong>
+            <span>Districts Covered</span>
+        </div>
+        <div class="stat-item">
+            <strong>94%</strong>
+            <span>Requests Fulfilled</span>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ SHORTAGES ═══════════ -->
+<section class="shortages-section" id="shortages">
+    <div class="section-header">
+        <p class="section-label">⚠ Live Data</p>
+        <h2>Critical Shortages By District</h2>
+        <p>Updated in real-time by hospital lab technicians. Filter by your district to see what is needed locally.</p>
+    </div>
+
+    <div class="filter-bar">
+        <span class="filter-label">Filter by district:</span>
+        <select class="district-select" id="districtFilter" title="Filter by district" onchange="filterCards()">
+            <option value="all">All Districts</option>
+            <option value="western">Western Area</option>
+            <option value="bo">Bo</option>
+            <option value="kenema">Kenema</option>
+            <option value="makeni">Makeni</option>
+            <option value="kono">Kono</option>
+        </select>
+    </div>
+
+    <div class="shortages-grid" id="shortagesGrid">
+
+        <div class="shortage-card urgent" data-district="western">
+            <div class="card-header-row">
+                <div class="hospital-name">PCMH (Cottage Hospital)<br>
+                    <small>Freetown, Western Area</small>
+                </div>
+                <span class="status-badge urgent">Critical</span>
+            </div>
+            <div class="blood-type-display">O&minus;</div>
+            <div class="shortage-meta">2 units needed &middot; Maternal Emergency</div>
+            <div class="urgency-bar"><div class="urgency-fill" style="width:90%"></div></div>
+        </div>
+
+        <div class="shortage-card urgent" data-district="western">
+            <div class="card-header-row">
+                <div class="hospital-name">Connaught Hospital<br>
+                    <small>Freetown, Western Area</small>
+                </div>
+                <span class="status-badge urgent">Critical</span>
+            </div>
+            <div class="blood-type-display">A+</div>
+            <div class="shortage-meta">3 units needed &middot; Surgical Emergency</div>
+            <div class="urgency-bar"><div class="urgency-fill" style="width:75%"></div></div>
+        </div>
+
+        <div class="shortage-card stable" data-district="bo">
+            <div class="card-header-row">
+                <div class="hospital-name">Bo Government Hospital<br>
+                    <small>Bo District</small>
+                </div>
+                <span class="status-badge stable">Needed</span>
+            </div>
+            <div class="blood-type-display">B+</div>
+            <div class="shortage-meta">1 unit needed &middot; Scheduled Surgery</div>
+            <div class="urgency-bar"><div class="urgency-fill" style="width:30%"></div></div>
+        </div>
+
+        <div class="shortage-card urgent" data-district="kenema">
+            <div class="card-header-row">
+                <div class="hospital-name">Kenema Government Hospital<br>
+                    <small>Kenema District</small>
+                </div>
+                <span class="status-badge urgent">Critical</span>
+            </div>
+            <div class="blood-type-display">AB&minus;</div>
+            <div class="shortage-meta">2 units needed &middot; Trauma Case</div>
+            <div class="urgency-bar"><div class="urgency-fill" style="width:85%"></div></div>
+        </div>
+
+        <div class="shortage-card stable" data-district="makeni">
+            <div class="card-header-row">
+                <div class="hospital-name">Makeni Regional Hospital<br>
+                    <small>Bombali District</small>
+                </div>
+                <span class="status-badge stable">Needed</span>
+            </div>
+            <div class="blood-type-display">O+</div>
+            <div class="shortage-meta">2 units needed &middot; General Ward</div>
+            <div class="urgency-bar"><div class="urgency-fill" style="width:45%"></div></div>
+        </div>
+
+        <div class="shortage-card urgent" data-district="kono">
+            <div class="card-header-row">
+                <div class="hospital-name">Nixon Memorial Hospital<br>
+                    <small>Kono District</small>
+                </div>
+                <span class="status-badge urgent">Critical</span>
+            </div>
+            <div class="blood-type-display">B&minus;</div>
+            <div class="shortage-meta">1 unit needed &middot; Pediatric Emergency</div>
+            <div class="urgency-bar"><div class="urgency-fill" style="width:70%"></div></div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<section id="about">
+    <div class="section-header">
+        <p class="section-label">Simple Process</p>
+        <h2>How SaloneBlood Works</h2>
+        <p>Three steps. No bureaucracy. No connections required.</p>
+    </div>
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-number">01</div>
+            <div class="step-icon-wrap">🩸</div>
+            <h3>Register Your Type</h3>
+            <p>Create a free donor profile with your blood type, district, and phone number. Takes under 60 seconds.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">02</div>
+            <div class="step-icon-wrap">📲</div>
+            <h3>Receive SMS Alert</h3>
+            <p>When a nearby hospital needs your blood type, you get an instant SMS with the hospital name and urgency level — no internet needed.</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">03</div>
+            <div class="step-icon-wrap">🏥</div>
+            <h3>Walk Into Clinic</h3>
+            <p>Show up at the listed facility. The lab team already knows you're coming. Save a life in under an hour.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ REGISTER ═══════════ -->
+<section class="register-section" id="register">
+    <div class="register-inner">
+        <div class="section-header">
+            <p class="section-label">Become a Donor</p>
+            <h2>Register as a Voluntary Donor</h2>
+            <p>Join 347 registered donors across Sierra Leone. Be the call someone needs when it matters most.</p>
+        </div>
+        <div class="register-form">
+            <input type="text"  class="form-input" placeholder="Full Name" />
+            <input type="tel"   class="form-input" placeholder="Phone Number (for SMS alerts)" />
+            <select class="district-select form-input" title="Blood Type" style="flex:0 0 auto;min-width:140px">
+                <option value="">Blood Type</option>
+                <option>A+</option><option>A&minus;</option>
+                <option>B+</option><option>B&minus;</option>
+                <option>AB+</option><option>AB&minus;</option>
+                <option>O+</option><option>O&minus;</option>
+            </select>
+            <select class="district-select form-input" title="Your District" style="flex:0 0 auto;min-width:160px">
+                <option value="">Your District</option>
+                <option>Western Area</option>
+                <option>Bo</option><option>Kenema</option>
+                <option>Makeni</option><option>Kono</option>
+                <option>Port Loko</option><option>Kambia</option>
+            </select>
+            <button class="btn-primary" style="width:100%;justify-content:center;margin-top:0.25rem">
+                Register &amp; Enable SMS Alerts &rarr;
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-text">
+            <strong style="color:var(--text-primary)">SaloneBlood</strong> &mdash; Open-Source Digital Public Good<br>
+            &copy; 2026 &middot; Built for Sierra Leone &middot; Aligned with SDG 3 &amp; SDG 10
+        </div>
+        <div class="footer-sdg">
+            <span class="sdg-badge">SDG 3 &middot; Good Health</span>
+            <span class="sdg-badge">SDG 10 &middot; Reduced Inequalities</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Hamburger toggle (mobile nav)
+    document.getElementById('hamburger').addEventListener('click', function() {
+        document.getElementById('main-nav').classList.toggle('open');
+    });
+
+    // District filter
+    function filterCards() {
+        const val = document.getElementById('districtFilter').value;
+        document.querySelectorAll('.shortage-card').forEach(function(card) {
+            card.style.display = (val === 'all' || card.dataset.district === val)
+                ? 'block' : 'none';
+        });
+    }
+</script>
+</body>
+</html>
